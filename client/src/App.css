@@ -5,7 +5,7 @@
  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');
 /*Navbar*/
 
-<<<<<<< HEAD
+
 
         .nb-root {
           width: 100%;
@@ -989,7 +989,7 @@
           .ws{padding:60px 16px;}
           .wtitle{font-size:2rem;}
         }
-=======
+
 /* Navbar Style */
 
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');
@@ -2543,4 +2543,4 @@
         transform: rotate(360deg);
     }
 }
->>>>>>> 8e73209cbd35ddcd44a13527ca2caac3c9d42afa
+

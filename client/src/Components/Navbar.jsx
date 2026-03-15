@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
+import logo from "../assets/logo.png";
 const NAV_ITEMS = ["Home", "Services", "Projects", "About", "Contact"];
 
 export default function Navbar() {
