@@ -1,10 +1,5 @@
 import { useState, useEffect } from "react";
-<<<<<<< HEAD
 import { Link } from "react-router";
-=======
-import { Link, Links } from "react-router";
-import logo  from "../assets/logo.png"
->>>>>>> 8e73209cbd35ddcd44a13527ca2caac3c9d42afa
 const NAV_ITEMS = ["Home", "Services", "Projects", "About", "Contact"];
 
 export default function Navbar() {
@@ -22,9 +17,6 @@ export default function Navbar() {
     <div style={{ fontFamily: "'Rajdhani', sans-serif" }}>
       <style>{`
       
-<<<<<<< HEAD
-       
-=======
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');
 
         .nb-root {
@@ -367,7 +359,6 @@ export default function Navbar() {
           .nb-btns  { display: none; }
           .nb-hamburger { display: flex; }
         }
->>>>>>> 8e73209cbd35ddcd44a13527ca2caac3c9d42afa
       `}</style>
 
       <nav className="nb-root">
