@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router";
+import { Link, Links } from "react-router";
+import logo  from "../assets/logo.png"
 const NAV_ITEMS = ["Home", "Services", "Projects", "About", "Contact"];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeItem, setActiveItem] = useState("Home");
-
+  
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
@@ -365,22 +366,22 @@ export default function Navbar() {
         <div className={`nb-inner${scrolled ? " nb-scrolled" : ""}`}>
 
           {/* Logo */}
-          <a href="#" className="nb-logo">
-            <div className="nb-logo-mark">⚡</div>
-            <div className="nb-logo-text">Devforge<span></span></div>
-          </a>
+          <Link to="/" className="nb-logo">
+            <img className="logo-style" style={{height:"68px", width:"68px"}} src={logo} alt="" />
+            <div className="nb-logo-text"> <span>Dev</span><span style={{color:"#e1a203"}}>forge</span></div>
+          </Link>
 
           {/* Desktop Links */}
           <ul className="nb-links">
             {NAV_ITEMS.map((item) => (
               <li key={item}>
                 
-                 <a href="#"
+                 <Link to="/"
                   className={`nb-link${activeItem === item ? " nb-active" : ""}`}
-                  onClick={(e) => { e.preventDefault(); setActiveItem(item); }}
+                  // onClick={(e) => { e.preventDefault(); setActiveItem(item); }}
                 >
                   {item}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -410,7 +411,7 @@ export default function Navbar() {
               {NAV_ITEMS.map((item) => (
                 <li key={item}>
                   
-                   <a href="#"
+                   <Link to="/"
                     className="nb-mobile-link"
                     onClick={(e) => {
                       e.preventDefault();
@@ -420,7 +421,7 @@ export default function Navbar() {
                   >
                     {item}
                     <span className="nb-mobile-arrow">→</span>
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
