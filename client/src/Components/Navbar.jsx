@@ -388,7 +388,7 @@ export default function Navbar() {
 
           {/* Desktop Buttons */}
           <div className="nb-btns">
-            <button className="nb-btn-login">Log In</button>
+            <Link to="/login"><button className="nb-btn-login">Log In</button></Link>
            <Link to="/signup"> <button className="nb-btn-signup">Sign Up</button></Link>
           </div>
 
@@ -426,8 +426,8 @@ export default function Navbar() {
               ))}
             </ul>
             <div className="nb-mobile-btns">
-              <button className="nb-btn-login">Log In</button>
-              <button className="nb-btn-signup">Sign Up</button>
+             <Link to="/login"> <button className="nb-btn-login">Log In</button></Link>
+              <Link to="/signup"><button className="nb-btn-signup">Sign Up</button></Link>
             </div>
           </div>
         )}

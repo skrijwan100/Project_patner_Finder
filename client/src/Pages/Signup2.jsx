@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-
+import { handleError } from "../Components/ErrorMessage";
+import { Eye, EyeOff } from 'lucide-react';
 const globalStyles = `
   
 `;
@@ -125,7 +126,7 @@ function SkillsInput({ value, onChange }) {
       <input
         className="tag-input-inner"
         value={inputVal}
-        placeholder={value.length === 0 ? "Add skills — press Enter or comma" : ""}
+        placeholder={value.length === 0 ? "Add skills — press Enter or comma , Like - c++, Java," : ""}
         onChange={(e) => setInputVal(e.target.value)}
         onKeyDown={handleKey}
         onFocus={() => setFocused(true)}
@@ -138,14 +139,15 @@ function SkillsInput({ value, onChange }) {
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function Signup2() {
   const [form, setForm] = useState({
-    fullName: "", email: "", github: "",
+    fullName: "", email: "", password: "", repass: "", github: "",
     linkedin: "", portfolio: "", college: "",
     about: "", skills: [],
   });
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-
+    const [showPassword, setShowPassword] = useState(false);
+  const [showRepass, setShowRepass] = useState(false);
   const set = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
@@ -161,15 +163,47 @@ export default function Signup2() {
       e.linkedin = "Enter a valid LinkedIn URL";
     if (!form.college.trim()) e.college = "College name is required";
     if (form.skills.length === 0) e.skills = "Add at least one skill";
+    if (!form.password) {
+      e.password = "Password is required";
+    } else if (form.password.length < 8) {
+      e.password = "Password must be at least 8 characters long";
+    }
+
+    if (!form.repass) {
+      e.repass = "Please re-enter your password";
+    } else if (form.password !== form.repass) {
+      e.repass = "Passwords do not match";
+    }
+    setErrors(e);
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
+    console.log(form)
     setLoading(true);
+    try {
+
+
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/register`
+      const responce = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ fullname: form.fullName,password:form.password, email: form.email, collagename: form.college, bio: form.about, skill: form.skills, githublink: form.github, linkedinlink: form.linkedin, protfolio: form.portfolio })
+      });
+      const data = await responce.json()
+      console.log(data)
+    } catch (error) {
+      console.error(error)
+      setLoading(false)
+      return handleError("Internal Server Error!")
+
+    }
     setTimeout(() => { setLoading(false); setSubmitted(true); }, 1200);
   };
 
@@ -178,7 +212,7 @@ export default function Signup2() {
       <style>{globalStyles}</style>
       <div className="wrap">
         <div className="grid-bg" />
-        <BubbleCanvas />
+        {/* <BubbleCanvas /> */}
 
         <div className="inner">
           {/* Header */}
@@ -231,6 +265,32 @@ export default function Signup2() {
                   <input className="form-input" type="email" placeholder="you@example.com"
                     value={form.email} onChange={set("email")} />
                   {errors.email && <span className="err">⚠ {errors.email}</span>}
+                </div>
+              </div>
+
+              <div className="divider" />
+              <div className="form-row">
+                <div className="fl">
+                  <label className="form-label">Password</label>
+                <div style={{ position: "relative", display: "flex" }}>
+                  <input className="form-input" type={showPassword ? "text" : "password"} placeholder="••••••••"
+                      value={form.password} onChange={set("password")} />
+                  <button type="button" className="password-toggle-btn" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                  </div>
+                  {errors.password && <span className="err">⚠ {errors.password}</span>}
+                </div>
+                <div className="fl">
+                  <label className="form-label">Renter Password</label>
+                  <div style={{ position: "relative", display: "flex" }}>
+                 <input className="form-input" type={showRepass ? "text" : "password"} placeholder="••••••••"
+                      value={form.repass} onChange={set("repass")} />
+                  <button type="button" className="password-toggle-btn" onClick={() => setShowRepass(!showRepass)}>
+                      {showRepass ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                    </div>
+                   {errors.repass && <span className="err">⚠ {errors.repass}</span>}
                 </div>
               </div>
 

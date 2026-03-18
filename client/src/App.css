@@ -2100,6 +2100,38 @@
   border-color: rgba(255, 255, 255, .22);
   background: rgba(255, 255, 255, .07);
 }
+.email-input-login {
+
+  width: 100%;
+  padding: 14px 18px;
+  margin-bottom: 15px;
+  background: rgba(255, 255, 255, .05);
+  border: 1.5px solid rgba(255, 255, 255, .12);
+  border-radius: 12px;
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  outline: none;
+  transition: all .3s ease;
+  box-sizing: border-box;
+  letter-spacing: .04em;
+}
+
+.email-input-login::placeholder {
+  color: rgba(255, 255, 255, .28);
+}
+
+.email-input-login:focus {
+  border-color: #FF7A00;
+  background: rgba(255, 122, 0, .07);
+  box-shadow: 0 0 0 3px rgba(255, 122, 0, .18), 0 2px 16px rgba(255, 122, 0, .1);
+}
+
+.email-input-login:hover:not(:focus) {
+  border-color: rgba(255, 255, 255, .22);
+  background: rgba(255, 255, 255, .07);
+}
 
 .social-btn {
   flex: 1;

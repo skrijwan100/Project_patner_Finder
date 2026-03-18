@@ -20,67 +20,67 @@ export default function Signup1() {
     setTimeout(() => setMounted(true), 80)
   }, [])
   useEffect(() => {
-      const canvas = canvasRef.current
-      if (!canvas) return
-      const ctx = canvas.getContext('2d')
-      let animId
-      let particles = []
-  
-      const resize = () => {
-        canvas.width = canvas.offsetWidth
-        canvas.height = canvas.offsetHeight
-      }
-      resize()
-      window.addEventListener('resize', resize)
-  
-      for (let i = 0; i < 60; i++) {
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          r: Math.random() * 1.5 + 0.3,
-          dx: (Math.random() - 0.5) * 0.4,
-          dy: (Math.random() - 0.5) * 0.4,
-          o: Math.random() * 0.5 + 0.1,
-        })
-      }
-  
-      const draw = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        particles.forEach((p) => {
-          ctx.beginPath()
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-          ctx.fillStyle = `rgba(255,195,0,${p.o})`
-          ctx.fill()
-          p.x += p.dx
-          p.y += p.dy
-          if (p.x < 0 || p.x > canvas.width) p.dx *= -1
-          if (p.y < 0 || p.y > canvas.height) p.dy *= -1
-        })
-        // Draw connecting lines
-        for (let i = 0; i < particles.length; i++) {
-          for (let j = i + 1; j < particles.length; j++) {
-            const dx = particles[i].x - particles[j].x
-            const dy = particles[i].y - particles[j].y
-            const dist = Math.sqrt(dx * dx + dy * dy)
-            if (dist < 100) {
-              ctx.beginPath()
-              ctx.moveTo(particles[i].x, particles[i].y)
-              ctx.lineTo(particles[j].x, particles[j].y)
-              ctx.strokeStyle = `rgba(255,195,0,${0.08 * (1 - dist / 100)})`
-              ctx.lineWidth = 0.5
-              ctx.stroke()
-            }
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    let animId
+    let particles = []
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth
+      canvas.height = canvas.offsetHeight
+    }
+    resize()
+    window.addEventListener('resize', resize)
+
+    for (let i = 0; i < 60; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.5 + 0.3,
+        dx: (Math.random() - 0.5) * 0.4,
+        dy: (Math.random() - 0.5) * 0.4,
+        o: Math.random() * 0.5 + 0.1,
+      })
+    }
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      particles.forEach((p) => {
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(255,195,0,${p.o})`
+        ctx.fill()
+        p.x += p.dx
+        p.y += p.dy
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1
+      })
+      // Draw connecting lines
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x
+          const dy = particles[i].y - particles[j].y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < 100) {
+            ctx.beginPath()
+            ctx.moveTo(particles[i].x, particles[i].y)
+            ctx.lineTo(particles[j].x, particles[j].y)
+            ctx.strokeStyle = `rgba(255,195,0,${0.08 * (1 - dist / 100)})`
+            ctx.lineWidth = 0.5
+            ctx.stroke()
           }
         }
-        animId = requestAnimationFrame(draw)
       }
-      draw()
-      return () => {
-        cancelAnimationFrame(animId)
-        window.removeEventListener('resize', resize)
-      }
-    }, [])
-  
+      animId = requestAnimationFrame(draw)
+    }
+    draw()
+    return () => {
+      cancelAnimationFrame(animId)
+      window.removeEventListener('resize', resize)
+    }
+  }, [])
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -101,6 +101,10 @@ export default function Signup1() {
         setloder(false)
         handleSuccess("OTP Send successfully.")
         return setSubmitted(true)
+      }
+      if (!data.status) {
+        setloder(false)
+       return handleError("You already have an account")
       }
     } catch (error) {
       setloder(false)
@@ -145,17 +149,28 @@ export default function Signup1() {
   const handlegoogleauth = async () => {
     setloder1(true)
     try {
-
-
       const data = await googleSignIn();
       console.log(data.user.email)
       setfinalemail(data.user.email)
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/frisruserornot`
+      const responce = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email: data.user.email })
+      });
+      const data1=await responce.json()
+      if(!data1.status){
+        setloder1(false)
+        return handleError("You already have an account.")
+      }
       handleSuccess("Signup successful")
       setloder1(false)
     } catch (error) {
       console.log(error)
       handleError("Someing wrong. Try Again !")
-      return setlode1r(false)
+      return setloder1(false)
     }
   }
   const handlegithubauth = async () => {
@@ -176,6 +191,19 @@ export default function Signup1() {
       const email = await res.json();
       // console.log(email[0]);
       setfinalemail(email[0].email);
+const url = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/frisruserornot`
+      const responce = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email: email[0].email })
+      });
+      const data1=await responce.json()
+      if(!data1.status){
+        setloder2(false)
+        return handleError("You already have an account.")
+      }
       handleSuccess("Signup successful")
       return setloder2(false)
     } catch (error) {
@@ -187,7 +215,7 @@ export default function Signup1() {
 
   return (
     <div style={{
-      minHeight: '100vh', width: '100%',background:"#000",
+      minHeight: '100vh', width: '100%', background: "#000",
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       position: 'relative', overflow: 'hidden',
       fontFamily: "'Rajdhani', sans-serif", position: 'relative',

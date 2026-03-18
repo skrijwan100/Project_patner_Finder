@@ -1,278 +1,314 @@
-import React, { useState, useEffect } from 'react'
-import './Login.css'
-// Inject Rajdhani font + custom styles
-const GlobalStyles = () => (
-  <style>{`
-  
-  `}</style>
-)
-
-// Particles background
-const Particles = () => {
-  const particles = Array.from({ length: 18 }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    delay: `${Math.random() * 12}s`,
-    duration: `${8 + Math.random() * 10}s`,
-    size: Math.random() > 0.6 ? '3px' : '2px',
-    opacity: 0.3 + Math.random() * 0.5,
-  }))
-
-  return (
-    <>
-      {particles.map(p => (
-        <span key={p.id} className="particle" style={{
-          left: p.left, bottom: '-4px',
-          width: p.size, height: p.size,
-          animationDelay: p.delay,
-          animationDuration: p.duration,
-          opacity: p.opacity,
-        }} />
-      ))}
-    </>
-  )
-}
-
-// Eye icons
-const EyeOpen = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-    <circle cx="12" cy="12" r="3"/>
-  </svg>
-)
-
-const EyeOff = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/>
-  </svg>
-)
-
-const GithubIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{opacity:0.4, flexShrink:0}}>
-    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-  </svg>
-)
-
-const LinkedInIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{opacity:0.4, flexShrink:0}}>
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-  </svg>
-)
-
-const SkillsIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{opacity:0.4, flexShrink:0}}>
-    <polyline points="16 18 22 12 16 6"/>
-    <polyline points="8 6 2 12 8 18"/>
-  </svg>
-)
-
+import React, { useState, useEffect, useRef } from 'react'
+import { handleError, handleSuccess } from '../Components/ErrorMessage'
+import { useNavigate } from 'react-router'
+import { useAuth } from "../context/AuthContext";
+import { auth } from "../lib/firebase";
+import { GithubAuthProvider } from 'firebase/auth';
 export default function Login() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [errors, setErrors] = useState({})
-  const [shakeField, setShakeField] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState({
-    email: '', password: '', github: '', linkedin: '', skills: ''
-  })
-
-  const update = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }))
-
-  const validate = () => {
-    const errs = {}
-    if (!form.email) errs.email = 'Email is required'
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Invalid email address'
-    if (!form.password) errs.password = 'Password is required'
-    else if (form.password.length < 6) errs.password = 'Min 6 characters'
-    if (form.github && !/^https?:\/\/(www\.)?github\.com\/.+/.test(form.github)) errs.github = 'Invalid GitHub URL'
-    if (form.linkedin && !/^https?:\/\/(www\.)?linkedin\.com\/.+/.test(form.linkedin)) errs.linkedin = 'Invalid LinkedIn URL'
-    return errs
-  }
+  const { user, googleSignIn, githubSignIn } = useAuth();
+  const [email, setEmail] = useState('')
+  const [pass, setPass] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [loder, setloder] = useState(false)
+  const [loder1, setloder1] = useState(false)
+  const [loder2, setloder2] = useState(false)
+  const [otp, setotp] = useState('')
+  const [finalemail, setfinalemail] = useState('')
+  const naviget = useNavigate()
+  const canvasRef = useRef(null)
+  useEffect(() => {
+    setTimeout(() => setMounted(true), 80)
+  }, [])
+  useEffect(() => {
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const ctx = canvas.getContext('2d')
+      let animId
+      let particles = []
+  
+      const resize = () => {
+        canvas.width = canvas.offsetWidth
+        canvas.height = canvas.offsetHeight
+      }
+      resize()
+      window.addEventListener('resize', resize)
+  
+      for (let i = 0; i < 60; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.5 + 0.3,
+          dx: (Math.random() - 0.5) * 0.4,
+          dy: (Math.random() - 0.5) * 0.4,
+          o: Math.random() * 0.5 + 0.1,
+        })
+      }
+  
+      const draw = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        particles.forEach((p) => {
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(255,195,0,${p.o})`
+          ctx.fill()
+          p.x += p.dx
+          p.y += p.dy
+          if (p.x < 0 || p.x > canvas.width) p.dx *= -1
+          if (p.y < 0 || p.y > canvas.height) p.dy *= -1
+        })
+        // Draw connecting lines
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x
+            const dy = particles[i].y - particles[j].y
+            const dist = Math.sqrt(dx * dx + dy * dy)
+            if (dist < 100) {
+              ctx.beginPath()
+              ctx.moveTo(particles[i].x, particles[i].y)
+              ctx.lineTo(particles[j].x, particles[j].y)
+              ctx.strokeStyle = `rgba(255,195,0,${0.08 * (1 - dist / 100)})`
+              ctx.lineWidth = 0.5
+              ctx.stroke()
+            }
+          }
+        }
+        animId = requestAnimationFrame(draw)
+      }
+      draw()
+      return () => {
+        cancelAnimationFrame(animId)
+        window.removeEventListener('resize', resize)
+      }
+    }, [])
+  
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const errs = validate()
-    if (Object.keys(errs).length) {
-      setErrors(errs)
-      const first = Object.keys(errs)[0]
-      setShakeField(first)
-      setTimeout(() => setShakeField(null), 500)
-      return
+    e.preventDefault();
+    try {
+      if (!email) return
+
+      setloder(true)
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/sendemail`
+      const responce = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email: email })
+      });
+      const data = await responce.json()
+      if (data.status) {
+        setloder(false)
+        handleSuccess("OTP Send successfully.")
+        return setSubmitted(true)
+      }
+    } catch (error) {
+      setloder(false)
+      handleError("Internal Server Error !, Try Again")
+      return console.error(error);
     }
-    setErrors({})
-    setLoading(true)
-    await new Promise(r => setTimeout(r, 1800))
-    setLoading(false)
-    alert('Login successful! Welcome back, developer.')
+
+  }
+
+  const handleotpsubmit = async (e) => {
+    e.preventDefault();
+    setloder(true)
+    try {
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/otpverify`
+      const responce = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ fotp: otp })
+      });
+      const data = await responce.json()
+      if (!data.status) {
+        setloder(false);
+        return handleError("OTP not match , Try again!")
+      }
+      setloder(false)
+      handleSuccess("OTP verifyed.")
+      setfinalemail(email)
+      return naviget("/");
+
+
+    } catch (error) {
+      setloder(false)
+      handleError("Internal Server Error !, Try Again")
+      return console.error(error);
+
+    }
+
+  }
+
+  const handlegoogleauth = async () => {
+    setloder1(true)
+    try {
+
+
+      const data = await googleSignIn();
+      console.log(data.user.email)
+      setfinalemail(data.user.email)
+      handleSuccess("Signup successful")
+      setloder1(false)
+    } catch (error) {
+      console.log(error)
+      handleError("Someing wrong. Try Again !")
+      return setloder1(false)
+    }
+  }
+  const handlegithubauth = async () => {
+    try {
+      setloder2(true);
+      const data = await githubSignIn();
+      console.log(data.user)
+      const credential = GithubAuthProvider.credentialFromResult(data);
+      const accessToken = credential.accessToken;
+      console.log("Github Access Token:", accessToken);
+      const res = await fetch("https://api.github.com/user/emails", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/vnd.github+json"
+        }
+      });
+      const email = await res.json();
+      // console.log(email[0]);
+      setfinalemail(email[0].email);
+      handleSuccess("Signup successful")
+      return setloder2(false)
+    } catch (error) {
+      console.log(error)
+      handleError("Someing wrong. Try Again !")
+      return setloder2(false)
+    }
   }
 
   return (
-    <>
-      <GlobalStyles />
-      <div style={{ position: 'relative', minHeight: '100vh', background: '#000', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', fontFamily: "'Rajdhani', sans-serif" }}>
+    <div style={{
+      minHeight: '100vh', width: '100%',background:"#000",
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      position: 'relative', overflow: 'hidden',
+      fontFamily: "'Rajdhani', sans-serif", position: 'relative',
+      overflow: 'hidden', padding: '120px 24px 24px', boxSizing: 'border-box',
+    }}>
+      <style>{`
+        
+      `}</style>
+      <div className="hero-bg-grad" />
+      <canvas ref={canvasRef} className="hero-canvas" />
 
-        {/* Background */}
-        <div className="hero-bg-grad" />
-        <div className="grid-lines" />
-        <Particles />
 
-        {/* Card */}
-        <div className="glass-card fade-up" style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '720px', borderRadius: '20px', overflow: 'hidden' }}>
+      {/* Grid overlay */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        backgroundImage: 'linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px)',
+        backgroundSize: '52px 52px',
+        maskImage: 'radial-gradient(ellipse 75% 75% at 50% 50%,#000 40%,transparent 100%)',
+        WebkitMaskImage: 'radial-gradient(ellipse 75% 75% at 50% 50%,#000 40%,transparent 100%)',
+      }} />
 
-          {/* Top accent */}
-          <div className="accent-bar" />
+      {/* Glass Card */}
+      <div className="glass-card">
 
-          <div style={{ padding: '24px 48px 28px' }}>
+        {/* Logo */}
 
-            {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-              <div style={{ marginBottom: '14px' }}>
-                <span className="dev-badge">
-                  <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#FFC300"/></svg>
-                  Developer Platform
-                </span>
-              </div>
-              <h1 className="logo-glow" style={{ fontSize: '34px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#FFC300', lineHeight: 1 }}>
-                DEV<span style={{ color: '#fff' }}>GATE</span>
-              </h1>
-              <p style={{ marginTop: '8px', fontSize: '13px', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>
-                Access your workspace
-              </p>
-            </div>
+        {!submitted ? (
+          <>
+            <h1 style={{ color: '#fff', fontSize: '2rem', fontWeight: 700, margin: '0 0 6px', letterSpacing: '.06em', lineHeight: 1.15, textTransform: 'uppercase', textAlign:"center" }}>
+              Login
+            </h1>
+            <form >
+              <label style={{ display: 'block', color: 'rgba(255,255,255,.55)', fontSize: '.9rem', fontWeight: 600, marginBottom: 9, letterSpacing: '.1em', textTransform: 'uppercase' }}>
+                Enter your email
+              </label>
+              <input
+                className="email-input-login"
+                type="email"
+                placeholder="example@email.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+              />
+              <input
+                className="email-input-login"
+                type="password"
+                placeholder="*****"
+                value={pass}
+                onChange={e => setPass(e.target.value)}
+                required
+              />
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-
-              {/* Email */}
-              <div>
-                <div className={`input-group ${shakeField === 'email' ? 'shake' : ''}`}>
-                  <input
-                    type="email" id="email" placeholder=" "
-                    value={form.email} onChange={update('email')}
-                    style={{ paddingRight: '16px' }}
-                  />
-                  <label htmlFor="email">Email Address</label>
-                </div>
-                {errors.email && <p style={{ marginTop: '5px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.05em', color: 'rgba(255,90,90,0.85)', paddingLeft: '4px' }}>{errors.email}</p>}
-              </div>
-
-              {/* Password */}
-              <div>
-                <div className={`input-group ${shakeField === 'password' ? 'shake' : ''}`}>
-                  <input
-                    type={showPassword ? 'text' : 'password'} id="password" placeholder=" "
-                    value={form.password} onChange={update('password')}
-                    style={{ paddingRight: '48px' }}
-                  />
-                  <label htmlFor="password">Password</label>
-                  <button type="button" className="pw-toggle" onClick={() => setShowPassword(v => !v)} aria-label="Toggle password">
-                    {showPassword ? <EyeOff /> : <EyeOpen />}
-                  </button>
-                </div>
-                {errors.password && <p style={{ marginTop: '5px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.05em', color: 'rgba(255,90,90,0.85)', paddingLeft: '4px' }}>{errors.password}</p>}
-                <div style={{ textAlign: 'right', marginTop: '6px' }}>
-                  <a href="#" className="link-yellow" style={{ fontSize: '12px', letterSpacing: '0.06em' }}>Forgot Password?</a>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="divider" style={{ margin: '2px 0' }}>
-                <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', whiteSpace: 'nowrap' }}>Profile Links</span>
-              </div>
-
-              {/* GitHub */}
-              <div>
-                <div className={`input-group ${shakeField === 'github' ? 'shake' : ''}`} style={{ display: 'flex', alignItems: 'center' }}>
-                  <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}>
-                    <GithubIcon />
-                  </div>
-                  <input
-                    type="url" id="github" placeholder=" "
-                    value={form.github} onChange={update('github')}
-                    style={{ paddingLeft: '38px' }}
-                  />
-                  <label htmlFor="github" style={{ left: '38px' }}>GitHub Profile URL</label>
-                </div>
-                {errors.github && <p style={{ marginTop: '5px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.05em', color: 'rgba(255,90,90,0.85)', paddingLeft: '4px' }}>{errors.github}</p>}
-              </div>
-
-              {/* LinkedIn */}
-              <div>
-                <div className={`input-group ${shakeField === 'linkedin' ? 'shake' : ''}`}>
-                  <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}>
-                    <LinkedInIcon />
-                  </div>
-                  <input
-                    type="url" id="linkedin" placeholder=" "
-                    value={form.linkedin} onChange={update('linkedin')}
-                    style={{ paddingLeft: '38px' }}
-                  />
-                  <label htmlFor="linkedin" style={{ left: '38px' }}>LinkedIn Profile URL</label>
-                </div>
-                {errors.linkedin && <p style={{ marginTop: '5px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.05em', color: 'rgba(255,90,90,0.85)', paddingLeft: '4px' }}>{errors.linkedin}</p>}
-              </div>
-
-              {/* Skills */}
-              <div>
-                <div className="input-group">
-                  <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}>
-                    <SkillsIcon />
-                  </div>
-                  <input
-                    type="text" id="skills" placeholder=" "
-                    value={form.skills} onChange={update('skills')}
-                    style={{ paddingLeft: '38px' }}
-                  />
-                  <label htmlFor="skills" style={{ left: '38px' }}>Skills (comma-separated)</label>
-                </div>
-                {form.skills && (
-                  <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {form.skills.split(',').map(s => s.trim()).filter(Boolean).map((skill, i) => (
-                      <span key={i} style={{
-                        background: 'rgba(255,195,0,0.08)',
-                        border: '1px solid rgba(255,195,0,0.2)',
-                        borderRadius: '6px', padding: '2px 10px',
-                        fontSize: '11px', fontWeight: 600,
-                        letterSpacing: '0.06em', textTransform: 'uppercase',
-                        color: 'rgba(255,195,0,0.75)'
-                      }}>{skill}</span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Submit */}
-              <button type="submit" className="login-btn" style={{ marginTop: '6px' }} disabled={loading}>
-                {loading ? (
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: 'spin 0.8s linear infinite' }}>
-                      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-                    </svg>
-                    Authenticating...
-                    <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
-                  </span>
-                ) : (
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                      <path d="M7 11V7a5 5 0 0110 0v4"/>
-                    </svg>
-                    Access Workspace
-                  </span>
-                )}
+              <button type='submit' disabled={loder ? true : false} className="verify-btn" style={{ marginTop: 22 }} onClick={handleSubmit}>
+                {loder ? <span class="loader"></span> : "Verify Your Email →"}
               </button>
-
             </form>
 
-            {/* Footer */}
-            <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '13px', fontWeight: 500, letterSpacing: '0.04em', color: 'rgba(255,255,255,0.25)' }}>
-              Don't have an account?{' '}
-              <a href="#" className="link-yellow">Sign Up</a>
+            {/* Divider */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '26px 0' }}>
+              <div className="divline" />
+              <span style={{ color: 'rgba(255,255,255,.25)', fontSize: '.82rem', whiteSpace: 'nowrap', fontFamily: 'sans-serif', letterSpacing: '.04em' }}>or continue with</span>
+              <div className="divline" />
+            </div>
+
+            {/* Social Buttons */}
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button disabled={loder1 ? true : false} className="social-btn" onClick={handlegoogleauth}>
+                {loder1 ? <span class="loader-gg"></span> : <><svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+                  <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908C16.657 14.148 17.64 11.84 17.64 9.2z" fill="#4285F4" />
+                  <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853" />
+                  <path d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05" />
+                  <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335" />
+                </svg>
+                  Google</>}
+              </button>
+              <button disabled={loder2 ? true : false} className="social-btn" onClick={handlegithubauth}>
+                {loder2 ? <span class="loader-gg"></span> : <><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+                  GitHub</>}
+              </button>
+            </div>
+
+            <p style={{ color: 'rgba(255,255,255,.22)', fontSize: '.82rem', textAlign: 'center', margin: '24px 0 0', lineHeight: 1.7, fontFamily: 'sans-serif' }}>
+              Don't have an account? <span className="link">Signup</span><br />
+              <span style={{ fontSize: '.76rem' }}>By continuing, you agree to our <span className="link">Terms</span> &amp; <span className="link">Privacy Policy</span>.</span>
             </p>
-
+          </>
+        ) : (
+          /* Success State */
+          <div style={{ textAlign: 'center', padding: '16px 0' }}>
+            <div style={{ width: 68, height: 68, borderRadius: '50%', background: '#FF7A00', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 26px', boxShadow: '0 6px 36px rgba(255,122,0,.5)' }}>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+                <path d="M20 6L9 17l-5-5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <h2 style={{ color: '#fff', fontWeight: 700, fontSize: '1.7rem', margin: '0 0 8px', letterSpacing: '.08em', textTransform: 'uppercase' }}>
+              Check Your Inbox!
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,.45)', fontSize: '.95rem', lineHeight: 1.6, margin: '0 0 26px', fontFamily: 'sans-serif' }}>
+              We've sent a verification link to<br />
+              <span style={{ color: '#FF7A00', fontWeight: 600, fontSize: '1.05rem', letterSpacing: '.04em' }}>{email}</span>
+            </p>
+            <label style={{ display: 'block', color: 'rgba(255,255,255,.55)', fontSize: '.9rem', fontWeight: 600, marginBottom: 9, letterSpacing: '.1em', textTransform: 'uppercase' }}>
+              Enter your OTP
+            </label>
+            <input
+              className="email-input"
+              type="text"
+              name="otp"
+              placeholder="1234"
+              value={otp}
+              onChange={e => setotp(e.target.value)}
+              required
+            />
+            <button className="verify-btn" onClick={handleotpsubmit}>{loder ? <span class="loader"></span> : 'Verify OTP'}</button>
           </div>
-        </div>
-
+        )}
       </div>
-    </>
+    </div>
+
   )
 }

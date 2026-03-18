@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
         require:true
     },
     skill: {
-        type: String,
+        type: Array,
         require: true,
     },
     githublink:{
@@ -31,6 +31,9 @@ const userSchema = new mongoose.Schema({
     },
     protfolio:{
         types:String,
+    },
+    password:{
+        type:String,
     }
 },{ timestamps: true });
 const User = mongoose.model("User", userSchema);
