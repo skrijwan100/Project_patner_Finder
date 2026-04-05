@@ -14,11 +14,12 @@ import { useAuth } from './context/AuthContext';
 import { useUserData } from './context/UserdataContext';
 import LoadingScreen from './Components/LodingScreen';
 import secureLocalStorage from 'react-secure-storage';
-import { GithubAuthProvider } from 'firebase/auth';
+import Requirement from './Pages/PostRequirement';
+
 function App() {
   const { user } = useAuth()
   const { setUseralldata } = useUserData();
-  const [Isloginuser, setIsIsloginuser] = useState(false)
+  const [Isloginuser, setIsIsloginuser] = useState()
   useEffect(() => {
     const CheckUserLogin = async () => {
       try {
@@ -36,6 +37,8 @@ function App() {
           });
           const data = await response.json();
           setUseralldata(data.userdata)
+           setIsIsloginuser(true)
+         
         }
         if (token) {
           const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/getuser`, {
@@ -45,16 +48,12 @@ function App() {
           });
           const data = await res.json();
           setUseralldata(data.userdata)
-
+          setIsIsloginuser(true)
         }
       } catch (error) {
         console.log(error)
-      }
-      finally {
-
         setIsIsloginuser(true)
       }
-
     }
     CheckUserLogin();
   }, [user])
@@ -75,6 +74,8 @@ function App() {
           <Route path='/About' element={<About />} />
           <Route path='/Signup2' element={<Signup2 />} />
           <Route path='/login' element={<Login />} />
+          <Route path='/postrequiremen' element={<Requirement />} />
+          
         </Routes>
       </BrowserRouter>
     )
