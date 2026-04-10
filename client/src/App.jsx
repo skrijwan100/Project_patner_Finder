@@ -9,7 +9,6 @@ import Signup1 from './Pages/Signup1'
 import About from './Pages/About'
 import Signup2 from './Pages/Signup2';
 import Login from './Pages/Login';
-<<<<<<< HEAD
 import { useEffect, useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useUserData } from './context/UserdataContext';
@@ -17,22 +16,17 @@ import LoadingScreen from './Components/LodingScreen';
 import secureLocalStorage from 'react-secure-storage';
 import Requirement from './Pages/PostRequirement';
 
-=======
-import Footer from './Components/Footer';
-import Requriment from './Pages/Requriment';
-import Requirement2 from "./Pages/Requirement2";
->>>>>>> 3ef71b2 (update)
 function App() {
   const { user } = useAuth()
+  const {localuser}=useAuth();
   const { setUseralldata } = useUserData();
-  const [Isloginuser, setIsIsloginuser] = useState()
+  const [Isloginuser, setIsIsloginuser] = useState(false)
   useEffect(() => {
     const CheckUserLogin = async () => {
+      setIsIsloginuser(false)
       try {
-
-<<<<<<< HEAD
         const token = await user?.getIdToken();
-        const localtoken = secureLocalStorage.getItem('auth-token');
+        const localtoken = secureLocalStorage.getItem('auth-token');;
         if (localtoken) {
           const url = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/getuser`;
           const response = await fetch(url, {
@@ -57,13 +51,20 @@ function App() {
           setUseralldata(data.userdata)
           setIsIsloginuser(true)
         }
+        if(!token || !localtoken ){
+        setIsIsloginuser(true)
+        }
+        
       } catch (error) {
         console.log(error)
         setIsIsloginuser(true)
       }
     }
-    CheckUserLogin();
-  }, [user])
+   
+      CheckUserLogin();
+    
+    
+  }, [user,localuser])
   if (!Isloginuser)
     return (
       <LoadingScreen />
@@ -87,28 +88,5 @@ function App() {
       </BrowserRouter>
     )
   }
-
-=======
-  return (
-    <BrowserRouter>
-      <Navbar />
-      <ToastContainer />
-      <ToastContainer transition={Flip} />
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/Works' element={<Works />} />
-        <Route path='/signup' element={<Signup1 />} />
-        <Route path='/About' element={<About />} />
-        <Route path='/Signup2' element={<Signup2 />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/Requirement2' element={<Requirement2/>} />
-        <Route path='/Requriment' element={<Requriment />} />
-      </Routes>
-       <Footer/>
-    </BrowserRouter>
-  )
->>>>>>> 3ef71b2 (update)
-
-
 }
 export default App;
