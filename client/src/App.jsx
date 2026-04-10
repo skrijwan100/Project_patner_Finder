@@ -9,6 +9,7 @@ import Signup1 from './Pages/Signup1'
 import About from './Pages/About'
 import Signup2 from './Pages/Signup2';
 import Login from './Pages/Login';
+<<<<<<< HEAD
 import { useEffect, useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useUserData } from './context/UserdataContext';
@@ -16,6 +17,11 @@ import LoadingScreen from './Components/LodingScreen';
 import secureLocalStorage from 'react-secure-storage';
 import Requirement from './Pages/PostRequirement';
 
+=======
+import Footer from './Components/Footer';
+import Requriment from './Pages/Requriment';
+import Requirement2 from "./Pages/Requirement2";
+>>>>>>> 3ef71b2 (update)
 function App() {
   const { user } = useAuth()
   const { setUseralldata } = useUserData();
@@ -24,6 +30,7 @@ function App() {
     const CheckUserLogin = async () => {
       try {
 
+<<<<<<< HEAD
         const token = await user?.getIdToken();
         const localtoken = secureLocalStorage.getItem('auth-token');
         if (localtoken) {
@@ -81,6 +88,26 @@ function App() {
     )
   }
 
+=======
+  return (
+    <BrowserRouter>
+      <Navbar />
+      <ToastContainer />
+      <ToastContainer transition={Flip} />
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/Works' element={<Works />} />
+        <Route path='/signup' element={<Signup1 />} />
+        <Route path='/About' element={<About />} />
+        <Route path='/Signup2' element={<Signup2 />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/Requirement2' element={<Requirement2/>} />
+        <Route path='/Requriment' element={<Requriment />} />
+      </Routes>
+       <Footer/>
+    </BrowserRouter>
+  )
+>>>>>>> 3ef71b2 (update)
 
 
 }
