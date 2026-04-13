@@ -19,18 +19,21 @@ import { useAuth } from './context/AuthContext';
 import { useUserData } from './context/UserdataContext';
 import LoadingScreen from './Components/LodingScreen';
 import secureLocalStorage from 'react-secure-storage';
+import Requirement from './Pages/PostRequirement';
+import Footer from './Pages/Footer';
+import Requirement2 from './Pages/Requirment';
 
 function App() {
-  const { user } = useAuth();
+  const { user } = useAuth()
+  const {localuser}=useAuth();
   const { setUseralldata } = useUserData();
-  const [Isloginuser, setIsIsloginuser] = useState(false);
-
+  const [Isloginuser, setIsIsloginuser] = useState(false)
   useEffect(() => {
     const CheckUserLogin = async () => {
+      setIsIsloginuser(false)
       try {
         const token = await user?.getIdToken();
-        const localtoken = secureLocalStorage.getItem('auth-token');
-
+        const localtoken = secureLocalStorage.getItem('auth-token');;
         if (localtoken) {
           const url = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/getuser`;
           const response = await fetch(url, {
@@ -53,42 +56,44 @@ function App() {
           const data = await res.json();
           setUseralldata(data.userdata);
         }
-
-        setIsIsloginuser(true);
-
+        if(!token || !localtoken ){
+        setIsIsloginuser(true)
+        }
+        
       } catch (error) {
-        console.log(error);
-        setIsIsloginuser(true);
+        console.log(error)
+        setIsIsloginuser(true)
       }
-    };
+    }
+   
+      CheckUserLogin();
+    
+    
+  }, [user,localuser])
+  if (!Isloginuser)
+    return (
+      <LoadingScreen />
 
-    CheckUserLogin();
-  }, [user]);
-
-  if (!Isloginuser) {
-    return <LoadingScreen />;
+    )
+  if (Isloginuser) {
+    return (
+      <BrowserRouter>
+        <Navbar />
+        <ToastContainer transition={Flip} />
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/Works' element={<Works />} />
+          <Route path='/signup' element={<Signup1 />} />
+          <Route path='/About' element={<About />} />
+          <Route path='/Signup2' element={<Signup2 />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/postrequiremen' element={<Requirement2 />} />
+          
+        </Routes>
+        <Footer/>
+      </BrowserRouter>
+    )
   }
-
-  return (
-    <BrowserRouter>
-      <Navbar />
-      <ToastContainer transition={Flip} />
-
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/works' element={<Works />} />
-        <Route path='/signup' element={<Signup1 />} />
-        <Route path='/about' element={<About />} />
-        <Route path='/signup2' element={<Signup2 />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/Requirement2' element={<Requirement2 />} />
-        <Route path='/Requriment' element={<Requriment />} />
-        <Route path='/postrequiremen' element={<Requirement />} />
-      </Routes>
-
-      <Footer />
-    </BrowserRouter>
-  );
 }
 
 export default App;
