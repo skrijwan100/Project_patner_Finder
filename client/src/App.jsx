@@ -14,9 +14,9 @@ import { useAuth } from './context/AuthContext';
 import { useUserData } from './context/UserdataContext';
 import LoadingScreen from './Components/LodingScreen';
 import secureLocalStorage from 'react-secure-storage';
-import Requirement from './Pages/PostRequirement';
+// import Requirement from './Pages/PostRequirement';
 import Footer from './Pages/Footer';
-import Requirement2 from './Pages/Requirment';
+import Requirment from './Pages/PostUserRequirment';
 
 function App() {
   const { user } = useAuth()
@@ -84,8 +84,7 @@ function App() {
           <Route path='/About' element={<About />} />
           <Route path='/Signup2' element={<Signup2 />} />
           <Route path='/login' element={<Login />} />
-          <Route path='/postrequiremen' element={<Requirement2 />} />
-          
+          <Route path='/postrequiremen' element={<Requirment />} />
         </Routes>
         <Footer/>
       </BrowserRouter>

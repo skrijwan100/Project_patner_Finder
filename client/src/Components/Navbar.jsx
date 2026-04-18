@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { Settings, Globe, Sparkles, LogOut } from "lucide-react";
 import { useUserData } from "../context/UserdataContext";
 import secureLocalStorage from "react-secure-storage";
-const NAV_ITEMS = ["Home", "Services", "Projects", "About", "Contact"];
+const NAV_ITEMS = ["Home", "Postrequiremen", "Projects", "About", "Contact"];
 
 
 export default function Navbar() {
@@ -384,7 +384,7 @@ const handlelogout=async()=>{
             {NAV_ITEMS.map((item) => (
               <li key={item}>
                 <Link
-                  to="/"
+                  to={`/${item.toLocaleLowerCase()}`}
                   className={`nb-link${activeItem === item ? " nb-active" : ""}`}
                   onClick={(e) => {
                      // e.preventDefault(); 
