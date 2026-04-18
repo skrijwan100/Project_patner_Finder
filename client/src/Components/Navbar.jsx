@@ -28,7 +28,6 @@ export default function Navbar() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    console.log(useralldata)
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setProfileMenuOpen(false);
