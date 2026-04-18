@@ -2,13 +2,18 @@ import './App.css'
 import { ToastContainer, Flip } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Navbar from './Components/Navbar' // Fix 1
+import Navbar from './Components/Navbar'
 import Home from './Pages/Home'
 import Works from './Pages/Works'
 import Signup1 from './Pages/Signup1'
 import About from './Pages/About'
 import Signup2 from './Pages/Signup2';
 import Login from './Pages/Login';
+import Footer from './Components/Footer';
+import Requriment from './Pages/Requriment';
+import Requirement2 from "./Pages/Requirement2";
+import Requirement from './Pages/PostRequirement';
+
 import { useEffect, useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useUserData } from './context/UserdataContext';
@@ -39,10 +44,9 @@ function App() {
             },
           });
           const data = await response.json();
-          setUseralldata(data.userdata)
-           setIsIsloginuser(true)
-         
+          setUseralldata(data.userdata);
         }
+
         if (token) {
           const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/getuser`, {
             headers: {
@@ -50,8 +54,7 @@ function App() {
             }
           });
           const data = await res.json();
-          setUseralldata(data.userdata)
-          setIsIsloginuser(true)
+          setUseralldata(data.userdata);
         }
         if(!token || !localtoken ){
         setIsIsloginuser(true)
@@ -90,8 +93,6 @@ function App() {
       </BrowserRouter>
     )
   }
-
-
-
 }
+
 export default App;
