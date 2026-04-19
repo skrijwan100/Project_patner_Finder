@@ -19,9 +19,9 @@ import { useAuth } from './context/AuthContext';
 import { useUserData } from './context/UserdataContext';
 import LoadingScreen from './Components/LodingScreen';
 import secureLocalStorage from 'react-secure-storage';
-import Requirement from './Pages/PostRequirement';
+// import Requirement from './Pages/PostRequirement';
 import Footer from './Pages/Footer';
-import Requirement2 from './Pages/Requirment';
+import Requirment from './Pages/PostUserRequirment';
 
 function App() {
   const { user } = useAuth()
@@ -33,7 +33,7 @@ function App() {
       setIsIsloginuser(false)
       try {
         const token = await user?.getIdToken();
-        const localtoken = secureLocalStorage.getItem('auth-token');;
+        const localtoken = secureLocalStorage.getItem('auth-token');
         if (localtoken) {
           const url = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/getuser`;
           const response = await fetch(url, {
@@ -87,8 +87,7 @@ function App() {
           <Route path='/About' element={<About />} />
           <Route path='/Signup2' element={<Signup2 />} />
           <Route path='/login' element={<Login />} />
-          <Route path='/postrequiremen' element={<Requirement2 />} />
-          
+          <Route path='/postrequiremen' element={<Requirment />} />
         </Routes>
         <Footer/>
       </BrowserRouter>

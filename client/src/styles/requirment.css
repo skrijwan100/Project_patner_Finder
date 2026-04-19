@@ -1,0 +1,289 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body,
+#root {
+    background: #000;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+}
+
+.app-bg {
+    min-height: 100vh;
+    background: #000;
+    background-image:
+        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(255, 195, 0, 0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(255, 122, 0, 0.05) 0%, transparent 60%);
+    padding: 2rem 1rem 4rem;
+}
+
+.glass {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 195, 0, 0.18);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 20px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #FFC300, #FF7A00);
+    color: #000;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    padding: 0.75rem 1.75rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: transform 0.18s, box-shadow 0.18s;
+    letter-spacing: 0.01em;
+}
+
+.btn-primary:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 22px rgba(255, 195, 0, 0.45);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-back {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 0.5rem 1.1rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s, color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-back:hover {
+    border-color: rgba(255, 195, 0, 0.4);
+    color: #FFC300;
+}
+
+.selector-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1.5px solid rgba(255, 195, 0, 0.3);
+    border-radius: 18px;
+    padding: 2rem 2.5rem;
+    cursor: pointer;
+    text-align: left;
+    color: #fff;
+    width: 100%;
+    backdrop-filter: blur(12px);
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.selector-btn:hover {
+    border-color: #FFC300;
+    box-shadow: 0 0 36px rgba(255, 195, 0, 0.22);
+    background: rgba(255, 195, 0, 0.06);
+}
+
+.input-field {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 195, 0, 0.18);
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    color: #fff;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-field::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.input-field:focus {
+    border-color: rgba(255, 195, 0, 0.7);
+    box-shadow: 0 0 0 3px rgba(255, 195, 0, 0.1);
+}
+
+select.input-field option {
+    background: #111;
+    color: #fff;
+}
+
+textarea.input-field {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: rgba(255, 195, 0, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 195, 0, 0.12);
+    border: 1px solid rgba(255, 195, 0, 0.35);
+    border-radius: 20px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    color: #FFC300;
+    cursor: default;
+}
+
+.tag-remove {
+    background: none;
+    border: none;
+    color: rgba(255, 195, 0, 0.6);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.15s;
+}
+
+.tag-remove:hover {
+    color: #FF7A00;
+}
+
+.github-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1.1rem;
+}
+
+.github-prefix {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 195, 0, 0.25);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.github-prefix span {
+    padding: 0.7rem 0.9rem;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.35);
+    border-right: 1px solid rgba(255, 195, 0, 0.12);
+}
+
+.github-prefix input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 0.7rem 1rem;
+    color: #fff;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+}
+
+.github-prefix input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 195, 0, 0.25), transparent);
+    margin: 1.5rem 0;
+}
+
+.section-header {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.85rem;
+}
+
+.fade-in {
+    animation: fadeSlideIn 0.45s ease both;
+}
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(28px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.selector-enter {
+    animation: fadeSlideIn 0.45s ease both;
+}
+
+.match-bar-track {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    flex: 1;
+}
+
+.match-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #FFC300, #FF7A00);
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 195, 0, 0.3);
+    border-radius: 4px;
+}
+.error-message {
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    text-align: left;
+    background: rgba(255, 107, 107, 0.1);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

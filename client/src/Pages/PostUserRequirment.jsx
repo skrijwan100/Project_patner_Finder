@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import "../styles/requirment.css"
+import { useAuth } from "../context/AuthContext";
+import secureLocalStorage from "react-secure-storage";
+import { handleError, handleSuccess } from "../Components/ErrorMessage";
+
 function TagInput({ tags, setTags, placeholder }) {
   const [input, setInput] = useState("");
   const add = (e) => {
@@ -86,7 +90,23 @@ function GitHubSection({ profileUsername, setProfileUsername, repoLinks, setRepo
 
 function HackathonForm({ onSubmit, onBack, isSubmitting }) {
   const [f, setF] = useState({ title: "", problem: "", idea: "", usestack: [], needstack: [], category: "", hackthonlink: "" });
-  const up = (k, v) => setF(prev => ({ ...prev, [k]: v }));
+  const [error, setError] = useState("");
+
+  const up = (k, v) => {
+    setF(prev => ({ ...prev, [k]: v }));
+    if (error) setError(""); // Clear error on typing
+  };
+
+  const handleSubmit = () => {
+    if (!f.title.trim()) return setError("Hackathon Name is required.");
+    if (!f.category) return setError("Please select a Problem Category.");
+    if (!f.problem.trim()) return setError("Problem Statement / Theme is required.");
+    if (!f.idea.trim()) return setError("Your Project Idea is required.");
+    if (f.usestack.length === 0) return setError("Please add at least one Tech Stack.");
+    if (f.needstack.length === 0) return setError("Please add at least one Required Skill.");
+
+    onSubmit(f);
+  };
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
@@ -119,7 +139,7 @@ function HackathonForm({ onSubmit, onBack, isSubmitting }) {
         <FormField label="Your Project Idea">
           <textarea className="input-field" placeholder="What are you building?" value={f.idea} onChange={e => up("idea", e.target.value)} disabled={isSubmitting} />
         </FormField>
-        <FormField label="Hackthon website link / devfolio link">
+        <FormField label="Hackthon website link / devfolio link (Optional)">
           <input className="input-field" placeholder="https://example.com" value={f.hackthonlink} onChange={e => up("hackthonlink", e.target.value)} disabled={isSubmitting} />
         </FormField>
         <div className="section-divider" />
@@ -132,10 +152,18 @@ function HackathonForm({ onSubmit, onBack, isSubmitting }) {
         <FormField label="Skills">
           <TagInput tags={f.needstack} setTags={v => up("needstack", v)} placeholder="e.g. React, Python, Solidity — press Enter" disabled={isSubmitting} />
         </FormField>
+
+        {error && (
+          <div className="error-message">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            {error}
+          </div>
+        )}
+
         <button
           className="btn-primary"
           style={{ width: "100%" }}
-          onClick={() => onSubmit(f)}
+          onClick={handleSubmit}
           disabled={isSubmitting}
         >
           {isSubmitting ? "Posting Requirement..." : "Post Hackathon Requirement →"}
@@ -146,8 +174,25 @@ function HackathonForm({ onSubmit, onBack, isSubmitting }) {
 }
 
 function ProjectForm({ onSubmit, onBack, isSubmitting }) {
-  const [f, setF] = useState({ title: "", desc: "", usestack: [], needstack: [], type: "", status: "", githubRepo: ""});
-  const up = (k, v) => setF(prev => ({ ...prev, [k]: v }));
+  const [f, setF] = useState({ title: "", desc: "", usestack: [], needstack: [], type: "", status: "", githubRepo: "" });
+  const [error, setError] = useState("");
+
+  const up = (k, v) => {
+    setF(prev => ({ ...prev, [k]: v }));
+    if (error) setError(""); // Clear error on typing
+  };
+
+  const handleSubmit = () => {
+    if (!f.title.trim()) return setError("Project Title is required.");
+    if (!f.desc.trim()) return setError("Project Description is required.");
+    if (!f.type) return setError("Please select a Project Type.");
+    if (!f.status) return setError("Please select a Project Status.");
+    if (f.usestack.length === 0) return setError("Please add at least one Tech Stack.");
+    if (f.needstack.length === 0) return setError("Please add at least one Required Skill.");
+
+    // Form is valid! Submit data.
+    onSubmit(f);
+  };
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
@@ -199,23 +244,30 @@ function ProjectForm({ onSubmit, onBack, isSubmitting }) {
           <>
             <div className="section-header">GitHub Repositories of the project</div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "1rem" }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(255,195,0,0.85)">
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23a11.5 11.5 0 0 1 3-.405c1.02.005 2.045.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z" />
-        </svg>
-        <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "rgba(255,195,0,0.9)" }}>GitHub</span>
-        <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)", marginLeft: 2 }}>If you have the github Repositories pest here </span>
-      </div>
-            
-            <FormField label="Repositories Link">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(255,195,0,0.85)">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23a11.5 11.5 0 0 1 3-.405c1.02.005 2.045.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z" />
+              </svg>
+              <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "rgba(255,195,0,0.9)" }}>GitHub</span>
+              <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)", marginLeft: 2 }}>If you have the github Repositories pest here </span>
+            </div>
+
+            <FormField label="Repositories Link (Optional)">
               <input className="input-field" placeholder="https://github.com/skrijwan100/LandChain" value={f.githubRepo} onChange={e => up("githubRepo", e.target.value)} disabled={isSubmitting} />
             </FormField>
           </>
         )}
 
+        {error && (
+          <div className="error-message">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            {error}
+          </div>
+        )}
+
         <button
           className="btn-primary"
           style={{ width: "100%" }}
-          onClick={() => onSubmit(f)}
+          onClick={handleSubmit}
           disabled={isSubmitting}
         >
           {isSubmitting ? "Posting Requirement..." : "Post Project Requirement →"}
@@ -224,6 +276,7 @@ function ProjectForm({ onSubmit, onBack, isSubmitting }) {
     </div>
   );
 }
+
 function SuccessState({ type, onReset }) {
   return (
     <div className="glass fade-in" style={{ padding: "3rem 2rem", textAlign: "center", maxWidth: "520px", margin: "100px auto" }}>
@@ -243,11 +296,11 @@ function SuccessState({ type, onReset }) {
   );
 }
 
-export default function Requirement() {
+export default function Requirment() {
   const [activeMode, setActiveMode] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const { user } = useAuth()
   const handleSelect = (mode) => setActiveMode(mode);
   const handleBack = () => setActiveMode(null);
 
@@ -265,14 +318,96 @@ export default function Requirement() {
     console.log(`--- POSTING ${type.toUpperCase()} REQUIREMENT ---`);
     console.log(JSON.stringify(formData, null, 2));
     console.log(formData)
-
+    const token = await user?.getIdToken();
+    const localtoken = secureLocalStorage.getItem('auth-token');
     try {
-      // Simulate backend API latency (e.g. 1.5 seconds delay)
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (localtoken) {
+        if (type.toLocaleLowerCase() === 'hackathon') {
+          const url = `${import.meta.env.VITE_BACKEND_URL}/api/v2/reqirment/add-hackthon-reqirment`
+          const responce = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "auth-token": localtoken
+            },
+            body: JSON.stringify({ hackthonName: formData.title, hackthonProblemCategory: formData.category, hackthonProblemStatement: formData.problem, hackthonProjectIdea: formData.idea, hackthonWebsiteLink: formData.hackthonlink, AllTechStack: formData.usestack, RequiredSkills: formData.needstack })
+          });
+          const data = await responce.json()
+          if (data.status) {
+            setSubmitted(true);
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth', // Adds a nice animation
+            });
+            return handleSuccess("Requirment has been added.")
+          }
+        }
+        if (type.toLocaleLowerCase() === 'project') {
+          const url = `${import.meta.env.VITE_BACKEND_URL}/api/v2/reqirment/add-project-requirment`
+          const responce = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "auth-token": localtoken
+            },
+            body: JSON.stringify({ ProjectTitle: formData.title, ProjectDescription: formData.desc, ProjectType: formData.type, ProjectStatus: formData.status, AllTechStack: formData.usestack, RequiredSkills: formData.needstack, ProjectRepoLink: formData.githubRepo})
+          });
+          const data = await responce.json()
+          if (data.status) {
+            setSubmitted(true);
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth', // Adds a nice animation
+            });
+            return handleSuccess("Requirment has been added.")
+          }
+        }
+      }
+      if (token) {
+        if (type.toLocaleLowerCase() === 'hackathon') {
+          const url = `${import.meta.env.VITE_BACKEND_URL}/api/v2/reqirment/add-hackthon-reqirment`
+          const responce = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ hackthonName: formData.title, hackthonProblemCategory: formData.category, hackthonProblemStatement: formData.problem, hackthonProjectIdea: formData.idea, hackthonWebsiteLink: formData.hackthonlink, AllTechStack: formData.usestack, RequiredSkills: formData.needstack })
+          });
+          const data = await responce.json()
+          if (data.status) {
+            setSubmitted(true);
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth', // Adds a nice animation
+            });
+            return handleSuccess("Requirment has been added.")
+          }
+        }
+        if (type.toLocaleLowerCase() === 'project') {
+          const url = `${import.meta.env.VITE_BACKEND_URL}/api/v2/reqirment/add-project-requirment`
+          const responce = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ ProjectTitle: formData.title, ProjectDescription: formData.desc, ProjectType: formData.type, ProjectStatus: formData.status, AllTechStack: formData.usestack, RequiredSkills: formData.needstack, ProjectRepoLink: formData.githubRepo})
+          });
+          const data = await responce.json()
+          if (data.status) {
+            setSubmitted(true);
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth', // Adds a nice animation
+            });
+            return handleSuccess("Requirment has been added.")
+          }
+        }
 
-      console.log("✅ Success: Data posted to backend!");
-      setSubmitted(true);
+      }
     } catch (error) {
+      return handleError("Check your Internet")
       console.error("❌ Error posting requirement:", error);
     } finally {
       setIsSubmitting(false);
