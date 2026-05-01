@@ -17,6 +17,7 @@ import secureLocalStorage from 'react-secure-storage';
 import Footer from './Pages/Footer';
 import Requirment from './Pages/PostUserRequirment';
 import HackathonDetail from './Pages/AllReqirment';
+import ViewAllRequirment from './Pages/ViewAllRequiremnt';
 
 function App() {
   const { user } = useAuth()
@@ -85,7 +86,8 @@ function App() {
           <Route path='/Signup2' element={<Signup2 />} />
           <Route path='/login' element={<Login />} />
           <Route path='/postrequiremen' element={<Requirment />} />
-          <Route path='/aboutpage/:id' element={<HackathonDetail/>}/>
+          <Route path='/aboutrequirment/:id' element={<HackathonDetail/>}/>
+          <Route path='/viewallrequirment' element={<ViewAllRequirment/>}/>
         </Routes>
         <Footer/>
       </BrowserRouter>

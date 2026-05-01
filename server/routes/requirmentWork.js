@@ -54,5 +54,18 @@ requirmentWorkRouter.post("/add-project-requirment", fetchuer, async (req, res) 
 
 })
 
+requirmentWorkRouter.get("/all-hackthon-requirment", async (req, res) => {
+    try {
+
+        const allhackthondata = await RequirmentHackthon.find({});
+        console.log(allhackthondata)
+        return res.status(200).json({"data": allhackthondata, status: true })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ "msg": "Internal Servre errror", status: false })
+    }
+
+})
 
 export default requirmentWorkRouter;
