@@ -33,6 +33,6 @@ const RequirmentSchemaofHackthon = new mongoose.Schema({
         type:Array,
         require:true
     }, 
-})
+},{ timestamps: true })
 const RequirmentHackthon = mongoose.model("RequirmentHackthon", RequirmentSchemaofHackthon);
 export default RequirmentHackthon;

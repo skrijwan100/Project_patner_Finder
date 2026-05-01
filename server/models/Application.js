@@ -25,6 +25,6 @@ const ApplicationSchema = new mongoose.Schema({
     enum: ['pending', 'accepted', 'rejected'],
     default: 'pending'
   }
-});
+},{ timestamps: true });
 const userApplication= mongoose.model("userApplication",ApplicationSchema);
 export default userApplication;

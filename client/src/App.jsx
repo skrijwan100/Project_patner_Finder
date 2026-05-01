@@ -14,9 +14,9 @@ import { useAuth } from './context/AuthContext';
 import { useUserData } from './context/UserdataContext';
 import LoadingScreen from './Components/LodingScreen';
 import secureLocalStorage from 'react-secure-storage';
-// import Requirement from './Pages/PostRequirement';
 import Footer from './Pages/Footer';
 import Requirment from './Pages/PostUserRequirment';
+import HackathonDetail from './Pages/AllReqirment';
 
 function App() {
   const { user } = useAuth()
@@ -85,13 +85,11 @@ function App() {
           <Route path='/Signup2' element={<Signup2 />} />
           <Route path='/login' element={<Login />} />
           <Route path='/postrequiremen' element={<Requirment />} />
+          <Route path='/aboutpage/:id' element={<HackathonDetail/>}/>
         </Routes>
         <Footer/>
       </BrowserRouter>
     )
   }
-
-
-
 }
 export default App;

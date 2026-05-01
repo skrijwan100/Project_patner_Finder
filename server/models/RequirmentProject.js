@@ -33,6 +33,6 @@ const RequirmentSchemaofProject = new mongoose.Schema({
     ProjectRepoLink:{
         type:String,
     },
-})          
+},{ timestamps: true })          
 const RequirmentProject = mongoose.model("RequirmentProject", RequirmentSchemaofProject);
 export default RequirmentProject;
