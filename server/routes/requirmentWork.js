@@ -58,7 +58,6 @@ requirmentWorkRouter.get("/all-hackthon-requirment", async (req, res) => {
     try {
 
         const allhackthondata = await RequirmentHackthon.find({});
-        console.log(allhackthondata)
         return res.status(200).json({"data": allhackthondata, status: true })
 
     } catch (error) {
@@ -67,5 +66,19 @@ requirmentWorkRouter.get("/all-hackthon-requirment", async (req, res) => {
     }
 
 })
+
+requirmentWorkRouter.get("/all-project-requirment", async (req, res) => {
+    try {
+     
+        const allProjectdata = await RequirmentProject.find({});
+        return res.status(200).json({"data": allProjectdata, status: true })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ "msg": "Internal Server error", status: false })
+    }
+
+})
+
 
 export default requirmentWorkRouter;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ExternalLink, ChevronRight, Code2, Briefcase, Zap, Globe, X } from 'lucide-react';
+import { ArrowLeft, ExternalLink, ChevronRight, Code2, Briefcase, Zap, Globe, X, Activity } from 'lucide-react';
 import '../styles/viewallreqirment.css'
 import { handleError, handleSuccess } from '../Components/ErrorMessage';
 import secureLocalStorage from 'react-secure-storage';
@@ -48,10 +48,10 @@ const SkeletonCard = () => (
   </div>
 );
 
-export default function ViewAllRequirment() {
+export default function ViewAllProjectRequirment() {
   const [view, setView] = useState('list'); // 'list' or 'details'
   const [selectedProject, setSelectedProject] = useState(null);
-  const [hackthonData, setHackthonData] = useState([]);
+  const [projectData, setProjectData] = useState([]);
   const { user } = useAuth()
   const [valueOfApply, setValueOfApply] = useState('')
   // Loading State
@@ -63,13 +63,14 @@ export default function ViewAllRequirment() {
   const [hasConfirmedSkills, setHasConfirmedSkills] = useState(false);
 
 
-  const naviget= useNavigate()
 
+
+  const naviget=useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/api/v2/reqirment/all-hackthon-requirment`;
+        const url = `${import.meta.env.VITE_BACKEND_URL}/api/v2/reqirment/all-project-requirment`;
         const response = await fetch(url, {
           method: "GET",
           headers: {
@@ -82,7 +83,7 @@ export default function ViewAllRequirment() {
         }
 
         const data = await response.json();
-        setHackthonData(data.data);
+        setProjectData(data.data);
       } catch (error) {
         console.error("Error fetching data:", error);
         alert("server issue");
@@ -118,13 +119,10 @@ export default function ViewAllRequirment() {
           },
         });
         const data = await responce.json()
-        // console.log(data)
         if (!data.status) {
           return setValueOfApply('Apply as Partner')
         }
         return setValueOfApply('Already applied')
-
-
       }
       if (token) {
         const url = `${import.meta.env.VITE_BACKEND_URL}/api/v3/application/isApply/${project._id}`
@@ -136,12 +134,10 @@ export default function ViewAllRequirment() {
           },
         });
         const data = await responce.json()
-        // console.log(data)
         if (!data.status) {
           return setValueOfApply('Apply as Partner')
         }
         return setValueOfApply('Already applied')
-
       }
     } catch (error) {
       console.log(error);
@@ -150,7 +146,6 @@ export default function ViewAllRequirment() {
     finally {
       setIsapplyloder(false)
     }
-    
   };
 
   const handleBack = () => {
@@ -173,11 +168,10 @@ export default function ViewAllRequirment() {
       const token = await user?.getIdToken();
       const localtoken = secureLocalStorage.getItem('auth-token');
       try {
-
         setLoder(true)
         // Log the required ID for the backend call
         if (localtoken) {
-          const url = `${import.meta.env.VITE_BACKEND_URL}/api/v3/application/hackthon-application`
+          const url = `${import.meta.env.VITE_BACKEND_URL}/api/v3/application/project-application`
           const responce = await fetch(url, {
             method: "POST",
             headers: {
@@ -189,13 +183,11 @@ export default function ViewAllRequirment() {
           const data = await responce.json()
           if (!data.status) {
             return handleError('Network issue try again!')
-
           }
           handleSuccess('Application Submitted')
-
         }
         if (token) {
-          const url = `${import.meta.env.VITE_BACKEND_URL}/api/v3/application/hackthon-application`
+          const url = `${import.meta.env.VITE_BACKEND_URL}/api/v3/application/project-application`
           const responce = await fetch(url, {
             method: "POST",
             headers: {
@@ -207,13 +199,9 @@ export default function ViewAllRequirment() {
           const data = await responce.json()
           if (!data.status) {
             return handleError('Network issue try again!')
-
           }
           handleSuccess('Application Submitted')
         }
-
-
-        // TODO: Make your backend API call here using selectedProject._id
 
         // Close modal after submission
         handleViewDetails(selectedProject)
@@ -252,10 +240,10 @@ export default function ViewAllRequirment() {
                     <SkeletonCard key={index} />
                   ))
                 ) : (
-                  hackthonData.map((project) => (
+                  projectData.map((project) => (
                     <div key={project._id} className="card">
                       <div className="card-header">
-                        <h3 className="card-title">{project.hackthonName}</h3>
+                        <h3 className="card-title">{project.ProjectTitle}</h3>
                         <div className="icon-box">
                           <Briefcase size={20} />
                         </div>
@@ -263,9 +251,9 @@ export default function ViewAllRequirment() {
 
                       <div className="card-section">
                         <p className="card-label">
-                          <Globe size={16} /> Category
+                          <Globe size={16} /> Project Type
                         </p>
-                        <p className="card-value">{project.hackthonProblemCategory}</p>
+                        <p className="card-value">{project.ProjectType}</p>
                       </div>
 
                       <div className="card-section flex-grow">
@@ -305,18 +293,18 @@ export default function ViewAllRequirment() {
                 <div className="details-content">
                   <div className="details-header">
                     <div>
-                      <h2 className="details-title">{selectedProject.hackthonName}</h2>
-                      <Badge>{selectedProject.hackthonProblemCategory}</Badge>
+                      <h2 className="details-title">{selectedProject.ProjectTitle}</h2>
+                      <Badge>{selectedProject.ProjectType}</Badge>
                     </div>
 
                     <a
-                      href={selectedProject.hackthonWebsiteLink}
+                      href={selectedProject.ProjectRepoLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="visit-btn"
                     >
                       <ExternalLink size={20} />
-                      Visit Project Site
+                      Visit Repository
                     </a>
                   </div>
 
@@ -327,19 +315,19 @@ export default function ViewAllRequirment() {
                           <span className="section-icon-box">
                             <Briefcase size={20} />
                           </span>
-                          Problem Statement
+                          Project Description
                         </h3>
-                        <p className="section-text">{selectedProject.hackthonProblemStatement}</p>
+                        <p className="section-text">{selectedProject.ProjectDescription}</p>
                       </section>
 
                       <section>
                         <h3 className="section-title">
                           <span className="section-icon-box">
-                            <Zap size={20} />
+                            <Activity size={20} />
                           </span>
-                          Project Idea / Solution
+                          Project Status
                         </h3>
-                        <p className="section-text">{selectedProject.hackthonProjectIdea}</p>
+                        <p className="section-text">{selectedProject.ProjectStatus}</p>
                       </section>
                     </div>
 
@@ -369,7 +357,6 @@ export default function ViewAllRequirment() {
                   </div>
 
                   <div className="apply-footer">
-                    {/* Trigger Modal Open here */}
                     <button className="apply-btn" disabled={valueOfApply==='Already applied'} onClick={handleOpenModal}>
                       {isapplyloder?<span className="loader-gg"></span> :valueOfApply}
                     </button>
@@ -394,7 +381,7 @@ export default function ViewAllRequirment() {
             </div>
 
             <div className="modal-skills-box">
-              <h4>Required Skills for {selectedProject.hackthonName}</h4>
+              <h4>Required Skills for {selectedProject.ProjectTitle}</h4>
               <div className="tags-flex">
                 {selectedProject.RequiredSkills.map((skill, index) => (
                   <Badge key={`modal-req-${index}`} outline>{skill}</Badge>

@@ -4,6 +4,7 @@ import 'dotenv/config'
 import { connectDB } from "./db/db.js"
 import authRouter from "./routes/auth.js"
 import requirmentWorkRouter from "./routes/requirmentWork.js"
+import applicationRouter from "./routes/application.js"
 
 
 const app = express()
@@ -16,6 +17,7 @@ app.get("/",(req,res)=>{
 })
 app.use("/api/v1/auth",authRouter);
 app.use("/api/v2/reqirment",requirmentWorkRouter);
+app.use("/api/v3/application",applicationRouter);
 app.listen(process.env.PORT,()=>{
    console.log(`Server Started on http://localhost:${process.env.PORT}`)
 })

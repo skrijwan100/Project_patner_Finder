@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { Settings, Globe, Sparkles, LogOut } from "lucide-react";
 import { useUserData } from "../context/UserdataContext";
 import secureLocalStorage from "react-secure-storage";
-const NAV_ITEMS =[{title: "Home",link:'home'}, {title:"Postrequiremen",link:'postrequiremen'},{title: "Hackthon", link:'viewallrequirment'}, {title:"About",link:'about'}];
+const NAV_ITEMS =[{title: "Home",link:''}, {title:"Postrequiremen",link:'postrequiremen'},{title: "Hackthon", link:'viewallhackthonrequirment'},{title: "Project", link:'viewallprojectrequirment'} ,{title:"About",link:'about'}];
 
 
 export default function Navbar() {
@@ -384,10 +384,10 @@ const handlelogout=async()=>{
               <li key={i}>
                 <Link
                   to={`/${item.link}`}
-                  className={`nb-link${activeItem === item ? " nb-active" : ""}`}
+                  className={`nb-link ${activeItem === item ? "nb-active" : ""}`}
                   onClick={(e) => {
                      // e.preventDefault(); 
-                     // setActiveItem(item); 
+                     setActiveItem(item); 
                   }}
                 >
                   {item.title}
@@ -465,18 +465,17 @@ const handlelogout=async()=>{
         {menuOpen && (
           <div className="nb-mobile">
             <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px 0" }}>
-              {NAV_ITEMS.map((item) => (
-                <li key={item}>
+              {NAV_ITEMS.map((item,i) => (
+                <li key={i}>
                   <Link
-                    to="/"
+                    to={item.link}
                     className="nb-mobile-link"
                     onClick={(e) => {
-                      e.preventDefault();
                       setActiveItem(item);
                       setMenuOpen(false);
                     }}
                   >
-                    {item}
+                    {item.title}
                   </Link>
                 </li>
               ))}

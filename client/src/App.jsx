@@ -18,6 +18,7 @@ import Footer from './Pages/Footer';
 import Requirment from './Pages/PostUserRequirment';
 import HackathonDetail from './Pages/AllReqirment';
 import ViewAllRequirment from './Pages/ViewAllRequiremnt';
+import ViewAllProjectRequirment from './Pages/viewAllProjectRequirment';
 
 function App() {
   const { user } = useAuth()
@@ -87,7 +88,8 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/postrequiremen' element={<Requirment />} />
           <Route path='/aboutrequirment/:id' element={<HackathonDetail/>}/>
-          <Route path='/viewallrequirment' element={<ViewAllRequirment/>}/>
+          <Route path='/viewallhackthonrequirment' element={<ViewAllRequirment/>}/>
+          <Route path='/viewallprojectrequirment' element={<ViewAllProjectRequirment/>}/>
         </Routes>
         <Footer/>
       </BrowserRouter>
