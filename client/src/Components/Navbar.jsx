@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router";
 import logo from "../assets/logo.png";
 import { useAuth } from "../context/AuthContext";
-import { Settings, Globe, Sparkles, LogOut } from "lucide-react";
+import { Settings, Globe, Sparkles, LogOut, Pencil } from "lucide-react";
 import { useUserData } from "../context/UserdataContext";
 import secureLocalStorage from "react-secure-storage";
-const NAV_ITEMS =[{title: "Home",link:''}, {title:"Postrequiremen",link:'postrequiremen'},{title: "Hackthon", link:'viewallhackthonrequirment'},{title: "Project", link:'viewallprojectrequirment'} ,{title:"About",link:'about'}];
+const NAV_ITEMS =[{title: "Home",link:''}, {title:"Postrequiremen",link:'postrequiremen'},{title: "Hackthon", link:'viewallhackthonrequirment'},{title: "Project", link:'viewallprojectrequirment'}];
 
 
 export default function Navbar() {
@@ -426,13 +426,13 @@ const handlelogout=async()=>{
                       </Link>
                     </li>
                     <li>
-                      <button className="nb-profile-item">
-                        <Globe size={18} /> English
-                      </button>
+                      <Link to='/post' className="nb-profile-item">
+                        <Globe size={18} /> Your Post
+                      </Link>
                     </li>
                     <li>
-                      <Link to="/upgrade" className="nb-profile-item">
-                        <Sparkles size={18} /> Upgrade
+                      <Link to="/application" className="nb-profile-item">
+                        <Pencil  size={18} /> Your Application 
                       </Link>
                     </li>
                     <li>

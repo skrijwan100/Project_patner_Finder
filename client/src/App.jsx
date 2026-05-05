@@ -19,6 +19,7 @@ import Requirment from './Pages/PostUserRequirment';
 import HackathonDetail from './Pages/AllReqirment';
 import ViewAllRequirment from './Pages/ViewAllRequiremnt';
 import ViewAllProjectRequirment from './Pages/viewAllProjectRequirment';
+import UserApplication from './Pages/UserApplication';
 
 function App() {
   const { user } = useAuth()
@@ -83,13 +84,14 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/Works' element={<Works />} />
           <Route path='/signup' element={<Signup1 />} />
-          <Route path='/About' element={<About />} />
           <Route path='/Signup2' element={<Signup2 />} />
           <Route path='/login' element={<Login />} />
           <Route path='/postrequiremen' element={<Requirment />} />
           <Route path='/aboutrequirment/:id' element={<HackathonDetail/>}/>
           <Route path='/viewallhackthonrequirment' element={<ViewAllRequirment/>}/>
           <Route path='/viewallprojectrequirment' element={<ViewAllProjectRequirment/>}/>
+          <Route path='/application' element={<UserApplication/>}/>
+
         </Routes>
         <Footer/>
       </BrowserRouter>

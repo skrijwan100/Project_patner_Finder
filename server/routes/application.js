@@ -47,11 +47,11 @@ applicationRouter.get("/isApply/:id", fetchuer, async (req, res) => {
         console.log(req.params.id, finduser._id)
 
         const finAppplication = await userApplication.find({
-            applicantId:finduser._id ,
-            eventId:new mongoose.Types.ObjectId(req.params.id) 
+            applicantId: finduser._id,
+            eventId: new mongoose.Types.ObjectId(req.params.id)
         });
         console.log(finAppplication)
-        if (finAppplication.length==0) {
+        if (finAppplication.length == 0) {
             return res.status(404).json({ "msg": "Not applied", status: false })
         }
         return res.status(200).json({ "msg": "Found", status: true })
@@ -59,6 +59,66 @@ applicationRouter.get("/isApply/:id", fetchuer, async (req, res) => {
     } catch (error) {
         console.log(error)
         return res.status(500).json({ "msg": "Internal Servre errror", status: false })
+    }
+});
+applicationRouter.get('/user-all-application', fetchuer, async (req, res) => {
+    try {
+        const email = req.email;
+        const finduser = await User.findOne({ email: email }).select("-password")
+        const applications = await userApplication.aggregate([
+            {
+                $match: {
+                    applicantId: finduser._id
+                }
+            },
+
+            // Lookup for Hackathon
+            {
+                $lookup: {
+                    from: 'requirmenthackthons', // collection name (lowercase + plural)
+                    localField: 'eventId',
+                    foreignField: '_id',
+                    as: 'hackthonDetails'
+                }
+            },
+
+            // Lookup for Project
+            {
+                $lookup: {
+                    from: 'requirmentprojects',
+                    localField: 'eventId',
+                    foreignField: '_id',
+                    as: 'projectDetails'
+                }
+            },
+
+            // Add correct eventDetails based on eventModel
+            {
+                $addFields: {
+                    eventDetails: {
+                        $cond: {
+                            if: { $eq: ['$eventModel', 'RequirmentHackthon'] },
+                            then: { $arrayElemAt: ['$hackthonDetails', 0] },
+                            else: { $arrayElemAt: ['$projectDetails', 0] }
+                        }
+                    }
+                }
+            },
+
+            // Optional: clean response
+            {
+                $project: {
+                    hackthonDetails: 0,
+                    projectDetails: 0
+                }
+            }
+        ]);
+        console.log(applications)
+        res.json({ success: true, data: applications });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 export default applicationRouter;
