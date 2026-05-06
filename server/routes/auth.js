@@ -7,6 +7,8 @@ import fetchuer from "../middlewares/fecthuser.js";
 import cloudinary from "../config/cloudinary.js";
 import upload from "../middlewares/upload.js";
 import fs from "fs"
+import proflieViews from "../models/ProfileViews.js";
+import mongoose from "mongoose";
 const authRouter = express.Router();
 
 let otp = null;
@@ -112,7 +114,7 @@ authRouter.post("/login", async (req, res) => {
         }
         const authtoken = jwt.sign({
             user: finduser._id,
-            email:finduser.email
+            email: finduser.email
         }, process.env.JWT_SERECT)
         return res.status(200).json({ "status": true, "message": "login Successful", "token": authtoken })
     } catch (error) {
@@ -151,5 +153,44 @@ authRouter.get("/getuser", fetchuer, async (req, res) => {
         return res.status(505).json({ "error": "Internal server error", status: false })
 
     }
+})
+
+authRouter.get("/getuserprofile/:id", fetchuer, async (req, res) => {
+    try {
+  
+        console.log("Yes")
+        const email = req.email;
+        const finduser = await User.findOne({ email: email }).select("-password")
+        const userdata = await User.findById(req.params.id)
+        if (!userdata) {
+            return res.status(404).json({ 'msg': "User not found", status: false })
+        }
+        const isViews = await proflieViews.find({
+            profileid: new mongoose.Types.ObjectId(req.params.id),
+            whoviewid: finduser._id
+
+        })
+        if (isViews.length == 0) {
+            const newViews = new proflieViews({
+                profileid: new mongoose.Types.ObjectId(req.params.id),
+                whoviewid: finduser._id
+            })
+            newViews.save();
+        }
+        const updateData = {
+            profileid: new mongoose.Types.ObjectId(req.params.id),
+            whoviewid: finduser._id
+        };
+        const updatethedata = await User.findByIdAndUpdate(req.params.id, { $set: updateData }, { new: true })
+
+        return res.status(200).json({ 'data': userdata, status: true })
+    } catch (error) {
+        console.log(error)
+        return res.status(505).json({ "error": "Internal server error", status: false })
+
+    }
+
+
+
 })
 export default authRouter;

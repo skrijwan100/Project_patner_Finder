@@ -3,6 +3,8 @@ import fetchuer from '../middlewares/fecthuser.js';
 import userApplication from '../models/Application.js';
 import User from '../models/User.js';
 import mongoose from 'mongoose';
+import RequirmentHackthon from '../models/RequirmentHackthon.js';
+import RequirmentProject from '../models/RequirmentProject.js';
 
 const applicationRouter = express.Router();
 
@@ -121,4 +123,100 @@ applicationRouter.get('/user-all-application', fetchuer, async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
+
+
+applicationRouter.get('/user-hackthon-posts-with-applicants', fetchuer, async (req, res) => {
+    try {
+        const email = req.email;
+        const finduser = await User.findOne({ email: email }).select("-password")
+        const userId = finduser._id
+        const hackathons = await RequirmentHackthon.aggregate([
+            { $match: { user: userId } },
+            {
+                $lookup: {
+                    from: 'userapplications',
+                    localField: '_id',
+                    foreignField: 'eventId',
+                    as: 'applications',
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: 'users',
+                                localField: 'applicantId',
+                                foreignField: '_id',
+                                as: 'applicant'
+                            }
+                        },
+                        { $unwind: '$applicant' },
+                        {
+                            $project: {
+                                status: 1,
+                                createdAt: 1,
+                                applicant: {
+                                    _id: 1,
+                                    name: 1,
+                                    email: 1
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            { $addFields: { type: 'hackathon' } }
+        ]);
+        res.json({ success: true, data: hackathons });
+
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+applicationRouter.get('/user-project-posts-with-applicants', fetchuer, async (req, res) => {
+    try {
+        const email = req.email;
+        const finduser = await User.findOne({ email: email }).select("-password")
+        const userId = finduser._id
+        const projects = await RequirmentProject.aggregate([
+            { $match: { user: userId } },
+            {
+                $lookup: {
+                    from: 'userapplications',
+                    localField: '_id',
+                    foreignField: 'eventId',
+                    as: 'applications',
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: 'users',
+                                localField: 'applicantId',
+                                foreignField: '_id',
+                                as: 'applicant'
+                            }
+                        },
+                        { $unwind: '$applicant' },
+                        {
+                            $project: {
+                                status: 1,
+                                createdAt: 1,
+                                applicant: {
+                                    _id: 1,
+                                    name: 1,
+                                    email: 1
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            { $addFields: { type: 'project' } }
+        ]);
+
+
+        res.json({ success: true, data: projects });
+
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
 export default applicationRouter;
+
+

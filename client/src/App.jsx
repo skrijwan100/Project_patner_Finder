@@ -20,6 +20,10 @@ import HackathonDetail from './Pages/AllReqirment';
 import ViewAllRequirment from './Pages/ViewAllRequiremnt';
 import ViewAllProjectRequirment from './Pages/viewAllProjectRequirment';
 import UserApplication from './Pages/UserApplication';
+import Post from './Pages/Post';
+import PostHackthon from './Pages/PostHackthon';
+import PostProject from './Pages/PostProject';
+import Profile from './Pages/Profile';
 
 function App() {
   const { user } = useAuth()
@@ -91,6 +95,11 @@ function App() {
           <Route path='/viewallhackthonrequirment' element={<ViewAllRequirment/>}/>
           <Route path='/viewallprojectrequirment' element={<ViewAllProjectRequirment/>}/>
           <Route path='/application' element={<UserApplication/>}/>
+          <Route path='/post' element={<Post/>}/>
+          <Route path='/post/hackthon' element={<PostHackthon/>}/>
+          <Route path='/post/project' element={<PostProject/>}/>
+          <Route path='/profile/:id' element={<Profile/>}/>
+
 
         </Routes>
         <Footer/>

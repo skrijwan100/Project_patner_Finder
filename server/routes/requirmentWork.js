@@ -80,5 +80,10 @@ requirmentWorkRouter.get("/all-project-requirment", async (req, res) => {
 
 })
 
+requirmentWorkRouter.delete('/delete-project/:id', fetchuer, async(req,res)=>{
+    const deletevent= await RequirmentProject.findByIdAndDelete(req.params.id);
+    
+
+})
 
 export default requirmentWorkRouter;
