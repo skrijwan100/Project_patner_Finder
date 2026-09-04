@@ -3,7 +3,7 @@ import { handleError, handleSuccess } from '../Components/ErrorMessage'
 import { useNavigate } from 'react-router'
 import { useAuth } from "../context/AuthContext";
 import { auth } from "../lib/firebase";
-import { GithubAuthProvider } from 'firebase/auth';
+
 import secureLocalStorage from 'react-secure-storage';
 export default function Login() {
   const { user, googleSignIn, githubSignIn, setLocaluser } = useAuth();
