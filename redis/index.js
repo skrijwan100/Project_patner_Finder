@@ -10,4 +10,5 @@ async function test() {
     console.log(value);
 
 }
+
 test();
