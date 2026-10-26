@@ -8,7 +8,7 @@ import cloudinary from "../config/cloudinary.js";
 import upload from "../middlewares/upload.js";
 import fs from "fs"
 import proflieViews from "../models/ProfileViews.js";
-import mongoose from "mongoose";
+import redis from "../redis/redis.js"
 const authRouter = express.Router();
 
 let otp = null;
@@ -143,10 +143,19 @@ authRouter.post("/login-email", async (req, res) => {
 authRouter.get("/getuser", fetchuer, async (req, res) => {
     try {
         const email = req.email;
+        const cacheKey = email;
+        const cached = await redis.get(cacheKey);
+        if (cached) {
+            console.log("Returned from Redis");
+            return res.status(200).json({ "msg": "User Found Returned from Redis", userdata: JSON.parse(cached), status: true });
+        }
         const finduser = await User.findOne({ email: email }).select("-password")
         if (!finduser) {
             return res.status(404).json({ "msg": "User not found", status: false })
         }
+        await redis.set(cacheKey, JSON.stringify(finduser), {
+            EX: 120,
+        });
         return res.status(200).json({ "msg": "User Found", userdata: finduser, status: true })
     } catch (error) {
         console.log(error)
@@ -159,6 +168,7 @@ authRouter.get("/getuserprofile/:id", fetchuer, async (req, res) => {
     try {
 
         // Current logged in user
+
         const currentUser = await User
             .findOne({ email: req.email })
             .select("-password");
@@ -170,6 +180,42 @@ authRouter.get("/getuserprofile/:id", fetchuer, async (req, res) => {
             });
         }
 
+        const cacheKey = req.params.id;
+        const cachedData = JASON.parse(await redis.get(cacheKey));
+        if (cachedData) {
+            if (currentUser._id.toString() !== req.params.id) {
+
+                // Create if not exists
+                // Update updatedAt if already exists
+                await proflieViews.findOneAndUpdate(
+
+                    {
+                        profileid: cachedData._id,
+                        whoviewid: currentUser._id
+                    },
+
+                    {},
+
+                    {
+                        upsert: true,
+                        new: true,
+                        setDefaultsOnInsert: true
+                    }
+
+                );
+
+            }
+            const totalViews = await proflieViews.countDocuments({
+                profileid: cachedData._id
+            });
+
+            return res.status(200).json({
+                status: true,
+                data: cachedData,
+                totalViews
+            });
+
+        }
         // Profile user
         const profileUser = await User
             .findById(req.params.id)
@@ -181,6 +227,9 @@ authRouter.get("/getuserprofile/:id", fetchuer, async (req, res) => {
                 message: "User not found"
             });
         }
+        await redis.set(cacheKey, JSON.stringify(profileUser), {
+            EX: 600,
+        });
 
         // Prevent self profile view count
         if (currentUser._id.toString() !== req.params.id) {
@@ -367,6 +416,8 @@ authRouter.post('/update-user-data', fetchuer, async (req, res) => {
         }
 
         await User.findByIdAndUpdate(finduser._id, { $set: req.body }, { new: true })
+        const cacheKey=req.email;
+        await redis.del(cacheKey);
         return res.status(200).json({ status: true, "msg": "Profile update Successful" })
     } catch (error) {
         return res.status(500).json({
