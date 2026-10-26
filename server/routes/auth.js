@@ -181,7 +181,7 @@ authRouter.get("/getuserprofile/:id", fetchuer, async (req, res) => {
         }
 
         const cacheKey = req.params.id;
-        const cachedData = JASON.parse(await redis.get(cacheKey));
+        const cachedData = JSON.parse(await redis.get(cacheKey));
         if (cachedData) {
             if (currentUser._id.toString() !== req.params.id) {
 
